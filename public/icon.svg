@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Cloud -->
+  <path fill="url(#grad)" d="M52 34c0-1.1-.1-2.2-.4-3.2C51.8 29.6 52 28.3 52 27c0-8.3-6.7-15-15-15-5.8 0-10.8 3.3-13.3 8.1C22.2 19.4 20.6 19 19 19c-5.5 0-10 4.5-10 10 0 .7.1 1.4.2 2.1C5.8 32.5 3 36.4 3 41c0 6.1 4.9 11 11 11h35c5.5 0 10-4.5 10-10 0-3.5-1.8-6.5-4.5-8.3-.3-.2-.3-.5-.5-.7z"/>
+  <!-- Sync arrows -->
+  <g fill="#ffffff">
+    <path d="M27 35l-4-4-4 4h3v8h2v-8h3z"/>
+    <path d="M37 37l4 4 4-4h-3v-8h-2v8h-3z"/>
+  </g>
+  <!-- Folder -->
+  <path fill="#fbbf24" d="M22 42h20c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H22c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2z"/>
+  <path fill="#f59e0b" d="M20 44v-2c0-.6.4-1 1-1h4l2 2h15c.6 0 1 .4 1 1v8c0 .6-.4 1-1 1H21c-.6 0-1-.4-1-1v-8z"/>
+</svg>
