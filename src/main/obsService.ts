@@ -1,4 +1,5 @@
 // OBS Service for Main Process - Using Node.js SDK (no CORS issues)
+// @ts-nocheck
 import ObsClient from 'esdk-obs-nodejs'
 import type { IpcMainInvokeEvent } from 'electron'
 

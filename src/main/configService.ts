@@ -1,5 +1,5 @@
-import { IpcMainInvokeEvent } from 'electron'
 import Store from 'electron-store'
+import type { IpcMainInvokeEvent } from 'electron'
 
 interface OBSConfig {
   accessKeyId: string
@@ -35,15 +35,15 @@ const store = new Store<AppConfig>({
   }
 })
 
-function getConfig<T>(_: IpcMainInvokeEvent, key: string): T | undefined {
+function getConfig<T>(_event: IpcMainInvokeEvent, key: string): T | undefined {
   return store.get(key) as T | undefined
 }
 
-function setConfig<T>(_: IpcMainInvokeEvent, key: string, value: T): void {
+function setConfig<T>(_event: IpcMainInvokeEvent, key: string, value: T): void {
   store.set(key, value)
 }
 
-function deleteConfig(_: IpcMainInvokeEvent, key: string): void {
+function deleteConfig(_event: IpcMainInvokeEvent, key: string): void {
   store.delete(key as keyof AppConfig)
 }
 

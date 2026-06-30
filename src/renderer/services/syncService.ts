@@ -56,8 +56,7 @@ class SyncService {
     // Process local files
     for (const localFile of localFiles) {
       const relativeName = localFile.name
-      const remoteKey = remotePath + relativeName + (localFile.isDirectory ? '/' : '')
-      const remoteObj = remoteObjects.find(obj => 
+      const remoteObj = remoteObjects.find(obj =>
         obj.name === relativeName || obj.name === relativeName + '/'
       )
 
@@ -304,7 +303,11 @@ class SyncService {
             break
 
           case 'delete-remote':
-            await obsService.deleteObject(item.remotePath!)
+            if (item.isDirectory) {
+              await obsService.deleteFolderRecursive(item.remotePath!)
+            } else {
+              await obsService.deleteObject(item.remotePath!)
+            }
             break
         }
         success++

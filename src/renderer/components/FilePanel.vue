@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { FileInfo } from '../../../electron'
 import type { OBSObject } from '../services/obsService'
 import { useUIStore } from '../stores/uiStore'

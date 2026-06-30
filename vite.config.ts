@@ -9,7 +9,6 @@ export default defineConfig({
     vue(),
     electron([
       {
-        // Main process entry
         entry: 'src/main/index.ts',
         onstart(options) {
           options.startup()
@@ -18,13 +17,12 @@ export default defineConfig({
           build: {
             outDir: 'dist-electron/main',
             rollupOptions: {
-              external: ['electron', 'electron-store', 'chokidar']
+              external: ['electron', 'electron-store', 'chokidar', 'esdk-obs-nodejs']
             }
           }
         }
       },
       {
-        // Preload script
         entry: 'src/preload/index.ts',
         onstart(options) {
           options.reload()
@@ -36,7 +34,12 @@ export default defineConfig({
         }
       }
     ]),
-    renderer()
+    renderer({
+      // Resolver dependencias nativas en el renderer si es necesario
+      resolve: {
+        esdkObsNodejs: { type: 'cjs' }
+      }
+    })
   ],
   resolve: {
     alias: {

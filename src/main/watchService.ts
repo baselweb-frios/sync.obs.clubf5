@@ -1,4 +1,5 @@
-import { IpcMainInvokeEvent, BrowserWindow } from 'electron'
+import type { IpcMainInvokeEvent } from 'electron'
+import { BrowserWindow } from 'electron'
 import * as chokidar from 'chokidar'
 import { minimatch } from 'minimatch'
 
@@ -7,7 +8,7 @@ let excludePatterns: string[] = []
 
 function sendWatchEvent(type: string, filePath: string) {
   const windows = BrowserWindow.getAllWindows()
-  windows.forEach(win => {
+  windows.forEach((win: BrowserWindow) => {
     win.webContents.send('watch:event', { type, path: filePath })
   })
 }
@@ -16,7 +17,7 @@ function shouldExclude(filePath: string): boolean {
   return excludePatterns.some(pattern => minimatch(filePath, pattern, { dot: true }))
 }
 
-async function startWatch(_: IpcMainInvokeEvent, watchPath: string, patterns: string[] = []): Promise<void> {
+async function startWatch(_event: IpcMainInvokeEvent, watchPath: string, patterns: string[] = []): Promise<void> {
   // Stop existing watcher
   if (watcher) {
     await watcher.close()

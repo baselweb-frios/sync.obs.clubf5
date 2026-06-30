@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { transferService, type TransferItem } from '../services/transferService'
+import { transferService } from '../services/transferService'
 
 const queue = transferService.getQueue()
 const stats = transferService.getStats()

@@ -181,6 +181,17 @@ class OBSService {
       etag: metadata.etag
     }
   }
+
+  /**
+   * Delete a folder and all its contents recursively
+   */
+  async deleteFolderRecursive(prefix: string): Promise<number> {
+    if (!this.initialized) {
+      throw new Error('OBS client not initialized')
+    }
+
+    return await window.electronAPI.obsDeleteFolderRecursive(prefix)
+  }
 }
 
 // Export singleton instance

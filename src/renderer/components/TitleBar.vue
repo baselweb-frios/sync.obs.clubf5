@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
 const appTitle = 'Sync OBS'
 
 const minimize = () => window.electronAPI.minimize()

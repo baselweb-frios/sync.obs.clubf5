@@ -19,13 +19,13 @@
     "paths": {
       "@/*": ["src/renderer/*"],
       "@main/*": ["src/main/*"]
-    },
-    "types": ["node"]
+    }
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
+    "src/types/**/*.d.ts",
     "electron.d.ts"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]

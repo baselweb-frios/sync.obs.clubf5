@@ -19,14 +19,26 @@ import NewFolderDialog from './components/NewFolderDialog.vue'
 import ConfirmDialog from './components/ConfirmDialog.vue'
 import Notifications from './components/Notifications.vue'
 
+// Types
+interface LocalItem extends FileInfo {
+  type: 'local'
+}
+
+interface RemoteItem extends OBSObject {
+  type: 'remote'
+  path: string
+}
+
+type FileItem = LocalItem | RemoteItem
+
 const configStore = useConfigStore()
 const uiStore = useUIStore()
 
 // Panel states
 const localPath = ref('')
 const remotePath = ref('')
-const localItems = ref<(FileInfo & { type: 'local' })[]>([])
-const remoteItems = ref<(OBSObject & { type: 'remote'; path: string })[]>([])
+const localItems = ref<LocalItem[]>([])
+const remoteItems = ref<RemoteItem[]>([])
 const localLoading = ref(false)
 const remoteLoading = ref(false)
 
@@ -50,20 +62,26 @@ const activePanel = ref<'local' | 'obs'>('local')
 // Initialize
 onMounted(async () => {
   await configStore.loadConfig()
-  
+
+  // Si no hay configuración OBS, mostrar el diálogo de configuración como primera pantalla
+  if (!configStore.hasOBSConfig) {
+    uiStore.openModal('settings')
+    return // No cargar nada más hasta que se configure
+  }
+
   // Set initial paths
   localPath.value = configStore.config.localPath || await window.electronAPI.getHomePath()
   remotePath.value = configStore.config.remotePath || ''
-  
+
   // Load file lists
   await refreshLocal()
   if (configStore.isConnected) {
     await refreshRemote()
   }
-  
+
   // Set up filter service
   filterService.setPatterns(configStore.config.excludePatterns)
-  
+
   // Set up watch events
   window.electronAPI.onWatchEvent((event) => {
     console.log('Watch event:', event)
@@ -72,7 +90,7 @@ onMounted(async () => {
       refreshLocal()
     }
   })
-  
+
   // Start watch if enabled
   if (configStore.config.watchEnabled && localPath.value) {
     window.electronAPI.startWatch(localPath.value, configStore.config.excludePatterns)
@@ -82,6 +100,28 @@ onMounted(async () => {
 // Watch for connection changes
 watch(() => configStore.isConnected, async (connected) => {
   if (connected) {
+    // Si es la primera vez que se conecta (después del onboarding), inicializar
+    if (!localPath.value || !remotePath.value) {
+      localPath.value = configStore.config.localPath || await window.electronAPI.getHomePath()
+      remotePath.value = configStore.config.remotePath || ''
+
+      await refreshLocal()
+      filterService.setPatterns(configStore.config.excludePatterns)
+
+      // Set up watch events
+      window.electronAPI.onWatchEvent((event) => {
+        console.log('Watch event:', event)
+        if (event.path.startsWith(localPath.value)) {
+          refreshLocal()
+        }
+      })
+
+      // Start watch if enabled
+      if (configStore.config.watchEnabled && localPath.value) {
+        window.electronAPI.startWatch(localPath.value, configStore.config.excludePatterns)
+      }
+    }
+
     await refreshRemote()
   } else {
     remoteItems.value = []
@@ -151,25 +191,29 @@ function handleRemotePathChange(path: string) {
   navigateRemote(path)
 }
 
-function handleLocalSelect(item: FileInfo & { type: 'local' }, multi: boolean) {
-  activePanel.value = 'local'
-  uiStore.selectLocalItem(item.path, multi)
+function handleLocalSelect(item: FileItem, multi: boolean) {
+  if (item.type === 'local') {
+    activePanel.value = 'local'
+    uiStore.selectLocalItem(item.path, multi)
+  }
 }
 
-function handleRemoteSelect(item: OBSObject & { type: 'remote' }, multi: boolean) {
-  activePanel.value = 'obs'
-  uiStore.selectRemoteItem(item.key, multi)
+function handleRemoteSelect(item: FileItem, multi: boolean) {
+  if (item.type === 'remote') {
+    activePanel.value = 'obs'
+    uiStore.selectRemoteItem(item.key, multi)
+  }
 }
 
-function handleLocalOpen(item: FileInfo & { type: 'local' }) {
-  if (item.isDirectory) {
+function handleLocalOpen(item: FileItem) {
+  if (item.type === 'local' && item.isDirectory) {
     navigateLocal(item.path)
   }
   // For files, could open with system default app
 }
 
-function handleRemoteOpen(item: OBSObject & { type: 'remote' }) {
-  if (item.isDirectory) {
+function handleRemoteOpen(item: FileItem) {
+  if (item.type === 'remote' && item.isDirectory) {
     navigateRemote(item.key)
   }
 }
@@ -229,6 +273,20 @@ function handleDelete() {
       for (const path of localSelected) {
         try {
           const item = localItems.value.find(f => f.path === path)
+          
+          // Prevent deleting current folder or parent folders
+          const normalizedPath = path.replace(/\\/g, '/').toLowerCase()
+          const normalizedLocalPath = localPath.value.replace(/\\/g, '/').toLowerCase()
+          
+          if (normalizedLocalPath.startsWith(normalizedPath) || normalizedLocalPath === normalizedPath) {
+            uiStore.notify({ 
+              type: 'warning', 
+              title: 'No se puede eliminar', 
+              message: `No se puede eliminar la carpeta actual o sus padres: ${item?.name || path}` 
+            })
+            continue
+          }
+          
           if (item?.isDirectory) {
             await window.electronAPI.deleteFolder(path)
           } else {
@@ -242,7 +300,26 @@ function handleDelete() {
       // Delete remote files
       for (const key of remoteSelected) {
         try {
-          await obsService.deleteObject(key)
+          const item = remoteItems.value.find(f => f.key === key)
+          
+          // Prevent deleting current folder or parent folders
+          const normalizedKey = key.endsWith('/') ? key : key + '/'
+          const normalizedRemotePath = remotePath.value.endsWith('/') ? remotePath.value : remotePath.value + '/'
+          
+          if (normalizedRemotePath.startsWith(normalizedKey)) {
+            uiStore.notify({ 
+              type: 'warning', 
+              title: 'No se puede eliminar', 
+              message: `No se puede eliminar la carpeta actual o sus padres: ${item?.name || key}` 
+            })
+            continue
+          }
+          
+          if (item?.isDirectory) {
+            await obsService.deleteFolderRecursive(key)
+          } else {
+            await obsService.deleteObject(key)
+          }
         } catch (error) {
           uiStore.notify({ type: 'error', title: 'Error', message: (error as Error).message })
         }

@@ -73,7 +73,7 @@ function registerHandlers() {
     return result.canceled ? null : result.filePaths[0]
   })
 
-  ipcMain.handle('dialog:selectFile', async (_, filters) => {
+  ipcMain.handle('dialog:selectFile', async (_event, filters?: { name: string; extensions: string[] }[]) => {
     const result = await dialog.showOpenDialog({
       properties: ['openFile'],
       filters: filters || []
@@ -83,7 +83,7 @@ function registerHandlers() {
 
   // App handlers
   ipcMain.handle('app:getVersion', () => app.getVersion())
-  ipcMain.handle('app:openExternal', (_, url: string) => shell.openExternal(url))
+  ipcMain.handle('app:openExternal', (_event, url: string) => shell.openExternal(url))
 
   // Window controls
   ipcMain.on('window:minimize', () => mainWindow?.minimize())

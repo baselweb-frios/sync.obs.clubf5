@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useUIStore } from '../stores/uiStore'
-
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   show: boolean
   title?: string
   message: string
@@ -21,13 +18,13 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
-const typeColors = {
+const typeColors: Record<'info' | 'warning' | 'danger', string> = {
   info: 'bg-primary-500',
   warning: 'bg-yellow-500',
   danger: 'bg-red-500'
 }
 
-const typeIcons = {
+const typeIcons: Record<'info' | 'warning' | 'danger', string> = {
   info: '❓',
   warning: '⚠️',
   danger: '🗑️'

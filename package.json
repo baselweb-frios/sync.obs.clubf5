@@ -3,36 +3,41 @@
   "version": "1.0.0",
   "description": "Aplicación de escritorio para sincronizar archivos locales con Huawei OBS",
   "main": "dist-electron/main/index.js",
+  "homepage": "https://github.com/clubf5/sync-obs",
+  "author": {
+    "name": "Club F5",
+    "email": "dev@clubf5.com"
+  },
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build && electron-builder",
-    "build:win": "vite build && electron-builder --win",
-    "build:mac": "vite build && electron-builder --mac",
-    "build:linux": "vite build && electron-builder --linux",
-    "preview": "vite preview",
-    "typecheck": "vue-tsc --noEmit"
+    "dev": "electron .",
+    "build": "electron-builder",
+    "build:dir": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
     "chokidar": "^3.6.0",
     "electron-store": "^8.2.0",
-    "esdk-obs-nodejs": "^3.24.3",
-    "minimatch": "^9.0.4",
-    "pinia": "^2.1.7",
-    "vue": "^3.4.21"
+    "electron-updater": "^6.8.9",
+    "esdk-obs-nodejs": "^3.26.2",
+    "minimatch": "^9.0.9",
+    "pinia": "^2.3.1",
+    "vue": "^3.5.38"
   },
   "devDependencies": {
-    "@types/node": "^20.11.30",
-    "@vitejs/plugin-vue": "^5.0.4",
-    "autoprefixer": "^10.4.19",
-    "electron": "^40.8.0",
-    "electron-builder": "^26.8.1",
-    "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.3",
-    "typescript": "^5.4.3",
-    "vite": "^7.3.1",
-    "vite-plugin-electron": "^0.28.6",
-    "vite-plugin-electron-renderer": "^0.14.5",
-    "vue-tsc": "^2.0.7"
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/node": "^20.19.43",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "autoprefixer": "^10.5.0",
+    "dmg-license": "^1.0.11",
+    "electron": "^33.4.11",
+    "electron-builder": "^26.15.3",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.3",
+    "vite-plugin-electron": "^0.28.8",
+    "vite-plugin-electron-renderer": "^0.14.7",
+    "vue-tsc": "^2.2.12"
   },
   "build": {
     "appId": "com.clubf5.sync-obs",
@@ -42,25 +47,132 @@
     },
     "files": [
       "dist/**/*",
-      "dist-electron/**/*"
+      "dist-electron/**/*",
+      "!node_modules/.pnpm/**"
     ],
+    "asar": true,
     "win": {
       "target": [
-        "nsis"
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
-      "icon": "public/icon.ico"
+      "icon": "public/icon.png",
+      "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
     },
     "mac": {
       "target": [
-        "dmg"
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64",
+            "universal"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64",
+            "universal"
+          ]
+        }
       ],
-      "icon": "public/icon.icns"
+      "icon": "public/icon.png",
+      "category": "public.app-category.productivity",
+      "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
     },
     "linux": {
       "target": [
-        "AppImage"
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "rpm",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "tar.gz",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
-      "icon": "public/icon.png"
+      "icon": "public/icon.png",
+      "category": "Utility",
+      "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Sync OBS"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.exe"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "window": {
+        "width": 540,
+        "height": 380
+      }
+    },
+    "deb": {
+      "depends": [
+        "gconf2",
+        "gconf-service",
+        "libnotify4",
+        "libappindicator1",
+        "libxtst6",
+        "libnss3"
+      ]
     }
   }
 }

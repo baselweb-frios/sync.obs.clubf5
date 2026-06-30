@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(convert:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm approve-builds:*)",
+      "Bash(pnpm generate-icons)",
+      "Bash(python3:*)",
+      "Bash(curl -s -F \"file=@public/icon.svg\" https://api.cloudconvert.com/v1/convert)",
+      "Bash(pnpm add:*)",
+      "Bash(node scripts/convert-svg-to-png.js:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(ls:*)",
+      "Bash(git checkout:*)",
+      "Bash(pnpm build:linux:*)"
+    ]
+  }
+}

@@ -11,8 +11,24 @@ const emit = defineEmits<{
   close: []
 }>()
 
+// Computed
+const canClose = computed(() => configStore.hasOBSConfig)
+
 // Tabs
 const activeTab = ref<'connection' | 'filters' | 'general'>('connection')
+
+// Methods
+function handleClose() {
+  if (canClose.value) {
+    emit('close')
+  } else {
+    uiStore.notify({
+      type: 'warning',
+      title: 'Configuración requerida',
+      message: 'Debes configurar la conexión OBS antes de continuar'
+    })
+  }
+}
 
 // Connection form
 const obsForm = ref({
@@ -56,11 +72,22 @@ async function testConnection() {
 
 async function saveConnection() {
   await configStore.saveOBSConfig(obsForm.value)
-  await configStore.connect()
-  uiStore.notify({
-    type: 'success',
-    title: 'Configuración guardada'
-  })
+  const connected = await configStore.connect()
+
+  if (connected) {
+    uiStore.notify({
+      type: 'success',
+      title: 'Configuración guardada y conectado exitosamente'
+    })
+    // Cerrar el modal después de configurar correctamente
+    emit('close')
+  } else {
+    uiStore.notify({
+      type: 'error',
+      title: 'Error de conexión',
+      message: configStore.connectionError || 'No se pudo conectar'
+    })
+  }
 }
 
 // Filter methods
@@ -111,12 +138,16 @@ async function selectLocalPath() {
 </script>
 
 <template>
-  <div class="settings-overlay" @click.self="emit('close')">
+  <div class="settings-overlay" @click.self="handleClose">
     <div class="settings-modal">
       <!-- Header -->
       <div class="modal-header">
         <h2 class="modal-title">Configuración</h2>
-        <button @click="emit('close')" class="close-btn">
+        <button
+          @click="handleClose"
+          class="close-btn"
+          :title="canClose ? 'Cerrar' : 'Configura OBS para continuar'"
+        >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>

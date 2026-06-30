@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useConfigStore } from '../stores/configStore'
 import { useUIStore } from '../stores/uiStore'
-import { syncService, type SyncMode, type SyncItem, type SyncResult } from '../services/syncService'
+import { syncService, type SyncMode, type SyncResult } from '../services/syncService'
 
 const configStore = useConfigStore()
 const uiStore = useUIStore()

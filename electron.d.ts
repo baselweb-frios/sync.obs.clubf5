@@ -45,6 +45,7 @@ export interface ElectronAPI {
   obsDeleteObjects: (keys: string[]) => Promise<boolean>
   obsCreateFolder: (prefix: string) => Promise<boolean>
   obsGetObjectMetadata: (key: string) => Promise<{ size: number; lastModified: string; etag: string } | null>
+  obsDeleteFolderRecursive: (prefix: string) => Promise<number>
   
   // App operations
   getAppVersion: () => Promise<string>

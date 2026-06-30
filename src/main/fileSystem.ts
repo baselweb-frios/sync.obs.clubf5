@@ -1,4 +1,4 @@
-import { IpcMainInvokeEvent } from 'electron'
+import type { IpcMainInvokeEvent } from 'electron'
 import * as fs from 'fs/promises'
 import * as path from 'path'
 import { homedir } from 'os'
@@ -12,7 +12,7 @@ export interface FileInfo {
   createdTime: number
 }
 
-async function readDirectory(_: IpcMainInvokeEvent, dirPath: string): Promise<FileInfo[]> {
+async function readDirectory(_event: IpcMainInvokeEvent, dirPath: string): Promise<FileInfo[]> {
   try {
     const entries = await fs.readdir(dirPath, { withFileTypes: true })
     const files: FileInfo[] = []
@@ -47,7 +47,7 @@ async function readDirectory(_: IpcMainInvokeEvent, dirPath: string): Promise<Fi
   }
 }
 
-async function getFileStats(_: IpcMainInvokeEvent, filePath: string): Promise<FileInfo> {
+async function getFileStats(_event: IpcMainInvokeEvent, filePath: string): Promise<FileInfo> {
   try {
     const stats = await fs.stat(filePath)
     return {
@@ -63,7 +63,7 @@ async function getFileStats(_: IpcMainInvokeEvent, filePath: string): Promise<Fi
   }
 }
 
-async function readFileAsBuffer(_: IpcMainInvokeEvent, filePath: string): Promise<ArrayBuffer> {
+async function readFileAsBuffer(_event: IpcMainInvokeEvent, filePath: string): Promise<ArrayBuffer> {
   try {
     const buffer = await fs.readFile(filePath)
     return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
@@ -72,7 +72,7 @@ async function readFileAsBuffer(_: IpcMainInvokeEvent, filePath: string): Promis
   }
 }
 
-async function writeFile(_: IpcMainInvokeEvent, filePath: string, data: ArrayBuffer): Promise<void> {
+async function writeFile(_event: IpcMainInvokeEvent, filePath: string, data: ArrayBuffer): Promise<void> {
   try {
     // Ensure directory exists
     await fs.mkdir(path.dirname(filePath), { recursive: true })
@@ -82,7 +82,7 @@ async function writeFile(_: IpcMainInvokeEvent, filePath: string, data: ArrayBuf
   }
 }
 
-async function deleteFile(_: IpcMainInvokeEvent, filePath: string): Promise<void> {
+async function deleteFile(_event: IpcMainInvokeEvent, filePath: string): Promise<void> {
   try {
     await fs.unlink(filePath)
   } catch (error) {
@@ -90,7 +90,7 @@ async function deleteFile(_: IpcMainInvokeEvent, filePath: string): Promise<void
   }
 }
 
-async function deleteFolder(_: IpcMainInvokeEvent, folderPath: string): Promise<void> {
+async function deleteFolder(_event: IpcMainInvokeEvent, folderPath: string): Promise<void> {
   try {
     await fs.rm(folderPath, { recursive: true, force: true })
   } catch (error) {
@@ -98,7 +98,7 @@ async function deleteFolder(_: IpcMainInvokeEvent, folderPath: string): Promise<
   }
 }
 
-async function createFolder(_: IpcMainInvokeEvent, folderPath: string): Promise<void> {
+async function createFolder(_event: IpcMainInvokeEvent, folderPath: string): Promise<void> {
   try {
     await fs.mkdir(folderPath, { recursive: true })
   } catch (error) {
@@ -106,7 +106,7 @@ async function createFolder(_: IpcMainInvokeEvent, folderPath: string): Promise<
   }
 }
 
-async function exists(_: IpcMainInvokeEvent, filePath: string): Promise<boolean> {
+async function exists(_event: IpcMainInvokeEvent, filePath: string): Promise<boolean> {
   try {
     await fs.access(filePath)
     return true

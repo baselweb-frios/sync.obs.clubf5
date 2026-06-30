@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useUIStore } from '../stores/uiStore'
-
-const uiStore = useUIStore()
 
 const emit = defineEmits<{
   close: []
