@@ -10,8 +10,8 @@
   },
   "scripts": {
     "dev": "electron .",
-    "build": "electron-builder",
-    "build:dir": "electron-builder --dir",
+    "build": "vue-tsc --noEmit && vite build && electron-builder",
+    "build:dir": "vue-tsc --noEmit && vite build && electron-builder --dir",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
