@@ -1,5 +1,5 @@
 {
-  "name": "sync-obs-clubf5",
+  "name": "obs-clubf5-tool",
   "version": "1.0.0",
   "description": "Aplicación de escritorio para sincronizar archivos locales con Huawei OBS",
   "main": "dist-electron/main/index.js",
@@ -40,8 +40,8 @@
     "vue-tsc": "^2.2.12"
   },
   "build": {
-    "appId": "com.clubf5.sync-obs",
-    "productName": "Sync OBS",
+    "appId": "com.github.baselweb-frios.sync-obs",
+    "productName": "Clubf5 Tools OBScloud",
     "directories": {
       "output": "release"
     },
