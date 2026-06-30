@@ -1,6 +1,5 @@
 name: Compilar y Publicar Electron
 
-# El proceso se activará solo cuando subas una etiqueta (tag) que empiece con "v" (ej: v1.0.0)
 on:
   push:
     tags:
@@ -11,28 +10,31 @@ jobs:
     name: Compilar en ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     
-    # Matriz para compilar en los 3 sistemas operativos en paralelo
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
-      # 1. Copia el código de tu repositorio en la máquina virtual de GitHub
       - name: Descargar código
         uses: actions/checkout@v4
 
-      # 2. Instala Node.js (puedes cambiar el 22 por la versión que uses)
+      # 1. Instalar pnpm de forma global en la máquina virtual
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9 # O la versión específica de pnpm que uses localmente
+
+      # 2. Configurar Node.js enlazándolo con el caché de pnpm
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
+          node-version: '24'
+          cache: 'pnpm' # Ahora GitHub Actions buscará correctamente tu archivo pnpm-lock.yaml
 
-      # 3. Instala las dependencias de tu proyecto (Node modules)
+      # 3. Instalar dependencias usando pnpm en modo estricto de CI
       - name: Instalar dependencias
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
-      # 4. Compila la app y crea la Release en GitHub de forma automática
       - name: Compilar y empaquetar aplicación
         uses: samuelmeuli/action-electron-builder@v1
         with:
